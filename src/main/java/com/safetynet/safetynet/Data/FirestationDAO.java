@@ -1,0 +1,40 @@
+package com.safetynet.safetynet.Data;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safetynet.safetynet.Model.Firestation;
+import com.safetynet.safetynet.intefaces.IFirestationDAO;
+
+public class FirestationDAO implements IFirestationDAO{
+    private ObjectMapper objectMapper;
+    Data data;
+    private FileWriter fileWriter;
+    public FirestationDAO() throws StreamReadException, DatabindException, IOException{
+        objectMapper=new ObjectMapper();
+        data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
+        fileWriter=new FileWriter("src/main/resources/data.json");
+    }
+    @Override
+    public void postFirestation(Firestation firestation) throws JsonProcessingException {
+        data.firestations.add(firestation);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+    }
+
+    @Override
+    public void putFirestation(Firestation firestation) {
+        data.firestations.removeIf(i->i.equals(firestation));
+        data.firestations.add(firestation);
+    }
+
+    @Override
+    public void deleteFirestation(Firestation firestation) {
+        data.firestations.removeIf(i->i.equals(firestation));
+    }
+
+}
