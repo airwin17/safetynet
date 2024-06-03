@@ -20,16 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.Data.PersonDAO;
 import com.safetynet.safetynet.Model.Person;
-import com.safetynet.safetynet.controllers.Controller;
+import com.safetynet.safetynet.controllers.CrudController;
 
 public class ControllerTest {
     @Autowired PersonDAO personDAO;
-    @Autowired public static Controller controller;
+    @Autowired public static CrudController controller;
     private static ObjectMapper objectMapper=new ObjectMapper();
     private static MockMvc mockMvc;
 @BeforeAll
 public static void resetdatabase() throws IOException{
-    mockMvc=MockMvcBuilders.standaloneSetup(new Controller()).build();
+    mockMvc=MockMvcBuilders.standaloneSetup(new CrudController()).build();
     
     Data data=objectMapper.readValue(new File("data2.json"), Data.class);
     String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);

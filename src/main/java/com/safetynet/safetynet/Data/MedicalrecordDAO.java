@@ -3,6 +3,7 @@ package com.safetynet.safetynet.Data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -44,6 +45,10 @@ public class MedicalrecordDAO implements IMedicalrecordDAO{
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
         fileWriter.write(str);
         fileWriter.close();
+    }
+    @Override
+    public Optional<Medicalrecord> getMedicalrecordByNames(String firstName, String lastName) {
+        return data.medicalrecords.stream().filter(i->i.firstName.equals(firstName)&&i.lastName.equals(lastName)).findFirst();
     }
 
 }

@@ -3,7 +3,10 @@ package com.safetynet.safetynet.Data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +47,21 @@ public class PersonDAO implements IPersonDAO{
         fileWriter.write(str);
         fileWriter.close();
     }
-
+    @Override
+    public Optional<Person> getPersonByNames(String firstName, String lastName) throws JsonProcessingException, IOException {
+        
+        return data.persons.stream().filter(i->i.firstName.equals(firstName)&&i.lastName.equals(lastName)).findFirst();
+    }
+    @Override
+    public List<Person> getPersonsByAdress(String address) throws JsonProcessingException, IOException {
+        return data.persons.stream().filter(i->i.address.equals(address)).toList();
+    }
+    public List<Person> getAllPersons() throws JsonProcessingException, IOException{
+        return data.persons;
+    }
+    public List<Person> getPersonsByLastName(String lastName) {
+        return data.persons.stream().filter(i->i.lastName.equals(lastName)).toList();
+    }
 
 
 }
