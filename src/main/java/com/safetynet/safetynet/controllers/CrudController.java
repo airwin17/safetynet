@@ -8,26 +8,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.safetynet.safetynet.Data.FirestationDAO;
-import com.safetynet.safetynet.Data.MedicalrecordDAO;
-import com.safetynet.safetynet.Data.PersonDAO;
-import com.safetynet.safetynet.Model.Firestation;
-import com.safetynet.safetynet.Model.Medicalrecord;
-import com.safetynet.safetynet.Model.Person;
+import com.safetynet.safetynet.model.Firestation;
+import com.safetynet.safetynet.model.Medicalrecord;
+import com.safetynet.safetynet.model.Person;
+import com.safetynet.safetynet.repository.impl.FirestationRepositoryImpl;
+import com.safetynet.safetynet.repository.impl.MedicalrecordRepositoryImpl;
+import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
+
 
 
 @RestController
 public class CrudController {
     
-    private PersonDAO personDAO;
-    private FirestationDAO firestationDAO;
-    private MedicalrecordDAO medicalrecordDAO;
+    private PersonRepositoryImpl personDAO;
+    private FirestationRepositoryImpl firestationDAO;
+    private MedicalrecordRepositoryImpl medicalrecordDAO;
     @PostMapping("/person") 
     public ResponseEntity<String> addPerson(@RequestBody Person person) throws IOException{
         try {
-            personDAO=new PersonDAO();
+            personDAO=new PersonRepositoryImpl();
             personDAO.postPerson(person);
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().build();
@@ -38,7 +38,7 @@ public class CrudController {
     public ResponseEntity<String> putPerson(@RequestBody Person person) throws IOException{
 
         try {
-            personDAO=new PersonDAO();
+            personDAO=new PersonRepositoryImpl();
             personDAO.putPerson(person);
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().build();
@@ -48,7 +48,7 @@ public class CrudController {
     @DeleteMapping("/person")
     public ResponseEntity<String> deletePerson(@RequestBody Person person) throws IOException{
         try {
-            personDAO=new PersonDAO();
+            personDAO=new PersonRepositoryImpl();
             personDAO.deletePerson(person);
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().build();
@@ -58,7 +58,7 @@ public class CrudController {
     @PostMapping("/firestation")
     public ResponseEntity<String> postFirestation(@RequestBody Firestation firestation) throws IOException{
         try{
-            firestationDAO=new FirestationDAO();
+            firestationDAO=new FirestationRepositoryImpl();
             firestationDAO.postFirestation(firestation);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();
@@ -68,7 +68,7 @@ public class CrudController {
     @PutMapping("/firestation")
     public ResponseEntity<String> putFirestation(@RequestBody Firestation firestation) throws IOException{
         try{
-            firestationDAO=new FirestationDAO();
+            firestationDAO=new FirestationRepositoryImpl();
             firestationDAO.putFirestation(firestation);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();
@@ -78,7 +78,7 @@ public class CrudController {
     @DeleteMapping("/firestation")
     public ResponseEntity<String> deleteFirestation(@RequestBody Firestation firestation) throws IOException{
         try{
-            firestationDAO=new FirestationDAO();
+            firestationDAO=new FirestationRepositoryImpl();
             firestationDAO.deleteFirestation(firestation);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();
@@ -88,7 +88,7 @@ public class CrudController {
     @PostMapping("/medicalrecord")
     public ResponseEntity<String> postMedicalrocord(@RequestBody Medicalrecord medicalrecord) throws IOException{
         try{
-            medicalrecordDAO=new MedicalrecordDAO();
+            medicalrecordDAO=new MedicalrecordRepositoryImpl();
             medicalrecordDAO.postMedicalrecord(medicalrecord);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();
@@ -98,7 +98,7 @@ public class CrudController {
     @PutMapping("/medicalrecord")
     public ResponseEntity<String> putMedicalrocord(@RequestBody Medicalrecord medicalrecord) throws IOException{
         try{
-            medicalrecordDAO=new MedicalrecordDAO();
+            medicalrecordDAO=new MedicalrecordRepositoryImpl();
             medicalrecordDAO.putMedicalrecord(medicalrecord);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();
@@ -108,7 +108,7 @@ public class CrudController {
     @PostMapping("/medicalrecord")
     public ResponseEntity<String> deleteMedicalrocord(@RequestBody Medicalrecord medicalrecord) throws IOException{
         try{
-            medicalrecordDAO=new MedicalrecordDAO();
+            medicalrecordDAO=new MedicalrecordRepositoryImpl();
             medicalrecordDAO.deleteMedicalrecord(medicalrecord);
         }catch(JsonProcessingException e){
             return ResponseEntity.ok().build();

@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Data;
+package com.safetynet.safetynet.repository.impl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,14 +10,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Model.Person;
-import com.safetynet.safetynet.intefaces.IPersonDAO;
+import com.safetynet.safetynet.Data.Data;
+import com.safetynet.safetynet.model.Person;
+import com.safetynet.safetynet.repository.PersonRepository;
 
-public class PersonDAO implements IPersonDAO{
+public class PersonRepositoryImpl implements PersonRepository{
     private ObjectMapper objectMapper;
     Data data;
     private FileWriter fileWriter;
-    public PersonDAO() throws StreamReadException, DatabindException, IOException{
+    public PersonRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
         data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
         fileWriter=new FileWriter("src/main/resources/data.json");
@@ -62,6 +63,8 @@ public class PersonDAO implements IPersonDAO{
     public List<Person> getPersonsByLastName(String lastName) {
         return data.persons.stream().filter(i->i.lastName.equals(lastName)).toList();
     }
-
+    public List<Person> getPersonByCity(String city) {
+        return data.persons.stream().filter(i->i.city.equals(city)).toList();
+    }
 
 }

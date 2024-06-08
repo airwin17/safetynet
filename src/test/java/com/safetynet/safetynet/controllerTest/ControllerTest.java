@@ -18,12 +18,12 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.safetynet.Data.Data;
-import com.safetynet.safetynet.Data.PersonDAO;
-import com.safetynet.safetynet.Model.Person;
 import com.safetynet.safetynet.controllers.CrudController;
+import com.safetynet.safetynet.model.Person;
+import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
 
 public class ControllerTest {
-    @Autowired PersonDAO personDAO;
+    @Autowired PersonRepositoryImpl personDAO;
     @Autowired public static CrudController controller;
     private static ObjectMapper objectMapper=new ObjectMapper();
     private static MockMvc mockMvc;

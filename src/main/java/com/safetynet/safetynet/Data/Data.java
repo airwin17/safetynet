@@ -2,9 +2,9 @@ package com.safetynet.safetynet.Data;
 
 import java.util.List;
 
-import com.safetynet.safetynet.Model.Firestation;
-import com.safetynet.safetynet.Model.Medicalrecord;
-import com.safetynet.safetynet.Model.Person;
+import com.safetynet.safetynet.model.Firestation;
+import com.safetynet.safetynet.model.Medicalrecord;
+import com.safetynet.safetynet.model.Person;
 
 public class Data {
     public List<Person> persons;

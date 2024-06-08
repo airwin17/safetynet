@@ -1,13 +1,13 @@
-package com.safetynet.safetynet.intefaces;
+package com.safetynet.safetynet.repository;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.safetynet.safetynet.Model.Person;
+import com.safetynet.safetynet.model.Person;
 
-public interface IPersonDAO {
+public interface PersonRepository {
     
     public void postPerson(Person person) throws JsonProcessingException, IOException;
     public void putPerson(Person person) throws JsonProcessingException, IOException;

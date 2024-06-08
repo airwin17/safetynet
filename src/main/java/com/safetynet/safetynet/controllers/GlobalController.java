@@ -15,26 +15,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Data.Data;
-import com.safetynet.safetynet.Data.FirestationDAO;
-import com.safetynet.safetynet.Data.MedicalrecordDAO;
-import com.safetynet.safetynet.Data.PersonDAO;
-import com.safetynet.safetynet.Model.Firestation;
-import com.safetynet.safetynet.Model.Medicalrecord;
-import com.safetynet.safetynet.Model.Person;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.safetynet.safetynet.model.Medicalrecord;
+import com.safetynet.safetynet.model.Person;
+import com.safetynet.safetynet.repository.impl.FirestationRepositoryImpl;
+import com.safetynet.safetynet.repository.impl.MedicalrecordRepositoryImpl;
+import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
+ 
 @RestController
-public class Controller {
-    private PersonDAO personDAO;
-    private FirestationDAO firestationDAO;
-    private MedicalrecordDAO medicalrecordDAO;
+public class GlobalController {
+    private PersonRepositoryImpl personDAO;
+    private FirestationRepositoryImpl firestationDAO;
+    private MedicalrecordRepositoryImpl medicalrecordDAO;
     ObjectMapper objectMapper=new ObjectMapper();
     String datafile="/src/main/resources/data.json";
     
     @GetMapping("/firestation")
     public ResponseEntity<String> getFirestation(@RequestParam String stationNumber) throws IOException, JsonProcessingException{
-        personDAO=new PersonDAO();
-        firestationDAO=new FirestationDAO();
+        personDAO=new PersonRepositoryImpl();
+        firestationDAO=new FirestationRepositoryImpl();
         firestationDAO.getFirestationByStation(stationNumber);
         Set<String> concernedAdresses=new HashSet<>(firestationDAO.getFirestationByStation(stationNumber));
         List<Person> concernedPersons=new LinkedList<>();
@@ -47,9 +48,9 @@ public class Controller {
     }
     @GetMapping("/childAlert")
     public ResponseEntity<String> getChildAlert(@RequestParam String address) throws IOException{
-        personDAO=new PersonDAO();
-        firestationDAO=new FirestationDAO();
-        medicalrecordDAO=new MedicalrecordDAO();
+        personDAO=new PersonRepositoryImpl();
+        firestationDAO=new FirestationRepositoryImpl();
+        medicalrecordDAO=new MedicalrecordRepositoryImpl();
         List<Person> concernedPersons=personDAO.getPersonsByAdress(address);
         concernedPersons=concernedPersons.stream()
         .filter(person->!medicalrecordDAO.getMedicalrecordByNames(person.firstName,person.lastName).orElseThrow().isAdult()).toList();
@@ -57,8 +58,8 @@ public class Controller {
     }
     @GetMapping("/phoneAlert")
     public ResponseEntity<String> getPhoneAlert(@RequestParam String fireStationNumber) throws IOException{
-        personDAO=new PersonDAO();
-        firestationDAO=new FirestationDAO();
+        personDAO=new PersonRepositoryImpl();
+        firestationDAO=new FirestationRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationDAO.getFirestationByStation(fireStationNumber));
         List<String> concernedPhone=new LinkedList<>();
         for(String address:adresses){
@@ -68,8 +69,8 @@ public class Controller {
     }
     @GetMapping("/fire") 
     public ResponseEntity<String> getFire(@RequestParam String adress) throws IOException{
-        personDAO=new PersonDAO();
-        firestationDAO=new FirestationDAO();
+        personDAO=new PersonRepositoryImpl();
+        firestationDAO=new FirestationRepositoryImpl();
         List<Person> concernedPersons=personDAO.getPersonsByAdress(adress);
         String firestation=firestationDAO.getFirestationByAdress(adress);
         List<Medicalrecord> concerned=new LinkedList<>();
@@ -80,20 +81,53 @@ public class Controller {
     }
     @GetMapping("/flood/stations")
     public ResponseEntity<String> getFloodStations(@RequestParam String stationNumber) throws IOException{
-        personDAO=new PersonDAO();
-        firestationDAO=new FirestationDAO();
+        personDAO=new PersonRepositoryImpl();
+        firestationDAO=new FirestationRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationDAO.getFirestationByStation(stationNumber));
         List<Person> concernedPersons=new LinkedList<>();
         for(String address:adresses){
             concernedPersons.addAll(personDAO.getPersonsByAdress(address));
         }
         Map<String,List<Person>> map=new HashMap<>();
+        ObjectNode objectNode=JsonNodeFactory.instance.objectNode();
+            
         for(Person person:concernedPersons){
-            if(!map.containsKey(person.lastName)){
-                map.put(person.lastName, personDAO.getPersonsByLastName(person.lastName));
+            Medicalrecord medicalrecord=medicalrecordDAO.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
+            ObjectNode thisPerson=mergeMedicalrecordToPerson(person,medicalrecord);
+            if(objectNode.get(person.lastName)!=null){
+                objectNode.set(person.lastName, thisPerson);
+            }else{
+                ((ArrayNode) objectNode.get(person.lastName)).add(thisPerson);
             }
         }
-        concernedPersons=new LinkedList<>(map.values());
-        return ResponseEntity.ok(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(concernedPersons));
+        return ResponseEntity.ok(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
+    }
+    @GetMapping("/personInfolastName")
+    public ResponseEntity<String> getPersonInfolastName(@RequestParam String lastName) throws IOException{
+        personDAO=new PersonRepositoryImpl();
+        medicalrecordDAO=new MedicalrecordRepositoryImpl();
+        List<Person> persons=personDAO.getPersonsByLastName(lastName);
+        ArrayNode arrayNode=JsonNodeFactory.instance.arrayNode();
+        for(Person person:persons){
+            Medicalrecord medicalrecord=medicalrecordDAO.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
+            ObjectNode objectNode=mergeMedicalrecordToPerson(person,medicalrecord);
+            arrayNode.add(objectNode);
+        }
+        return ResponseEntity.ok(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode));
+    }
+    @GetMapping("/communityEmail")
+    public ResponseEntity<String> getCommunityEmail(@RequestParam String city) throws IOException{
+        personDAO=new PersonRepositoryImpl();
+        List<Person> persons=personDAO.getPersonByCity(city);
+        List<String> emails=persons.stream().map(person->person.email).toList();
+        return ResponseEntity.ok(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(emails));
+    }
+    public ObjectNode mergeMedicalrecordToPerson(Person person,Medicalrecord medicalrecord){
+        ObjectNode personNode=objectMapper.convertValue(person, ObjectNode.class);
+        ObjectNode medicalrecordNode=objectMapper.convertValue(medicalrecord, ObjectNode.class);
+        medicalrecordNode.remove("firstName");
+        medicalrecordNode.remove("lastName");
+        personNode.set("medicalrecord",medicalrecordNode);
+        return personNode;
     }
 }

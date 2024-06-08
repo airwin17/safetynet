@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Model;
+package com.safetynet.safetynet.model;
 
 import java.util.Calendar;
 import java.util.List;

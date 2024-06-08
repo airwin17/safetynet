@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Model;
+package com.safetynet.safetynet.model;
 
 public class Firestation {
     public String address;

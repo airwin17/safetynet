@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Data;
+package com.safetynet.safetynet.repository.impl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,14 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Model.Medicalrecord;
-import com.safetynet.safetynet.intefaces.IMedicalrecordDAO;
+import com.safetynet.safetynet.Data.Data;
+import com.safetynet.safetynet.model.Medicalrecord;
+import com.safetynet.safetynet.repository.MedicalrecordRepository;
 
-public class MedicalrecordDAO implements IMedicalrecordDAO{
+public class MedicalrecordRepositoryImpl implements MedicalrecordRepository{
     private ObjectMapper objectMapper;
     Data data;
     private FileWriter fileWriter;
-    public MedicalrecordDAO() throws StreamReadException, DatabindException, IOException{
+    public MedicalrecordRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
         data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
         fileWriter=new FileWriter("src/main/resources/data.json");

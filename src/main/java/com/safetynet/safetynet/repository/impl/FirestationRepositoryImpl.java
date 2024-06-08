@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Data;
+package com.safetynet.safetynet.repository.impl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,15 +9,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Model.Firestation;
-import com.safetynet.safetynet.intefaces.IFirestationDAO;
+import com.safetynet.safetynet.Data.Data;
+import com.safetynet.safetynet.model.Firestation;
+import com.safetynet.safetynet.repository.FirestationRepository;
 
-public class FirestationDAO implements IFirestationDAO{
+public class FirestationRepositoryImpl implements FirestationRepository{
     private ObjectMapper objectMapper;
     Data data;
     @SuppressWarnings("unused")
     private FileWriter fileWriter;
-    public FirestationDAO() throws StreamReadException, DatabindException, IOException{
+    public FirestationRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
         data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
         fileWriter=new FileWriter("src/main/resources/data.json");
