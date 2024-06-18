@@ -3,6 +3,9 @@ package com.safetynet.safetynet.model;
 import java.util.Calendar;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Medicalrecord {
     public String birthdate;
     public String firstName;
@@ -33,16 +36,15 @@ public class Medicalrecord {
             }else return false;
         }else return false;
     }
-    public boolean isAdult(){
-        if(birthdate != null && !birthdate.equals("")){
-            String[] str=birthdate.split("/");
-            int[] abirthdate={Integer.parseInt(str[0]),Integer.parseInt(str[1]),Integer.parseInt(str[2])-1900};
-            Calendar calendar = Calendar.getInstance();
-            int[] adate={calendar.get(Calendar.DAY_OF_MONTH),calendar.get(calendar.get(Calendar.MONTH)),calendar.get(Calendar.YEAR)-1900};
-            long age=(adate[2]*365*24*60*60*1000)+(adate[1]*30*24*60*60*1000)+(adate[0]*24*60*60*1000)-(abirthdate[2]*365*24*60*60*1000)-(abirthdate[1]*30*24*60*60*1000)-(abirthdate[0]*24*60*60*1000);
-            return 1000*60*60*24*365<=age;
+    @JsonIgnore
+    public int getAge(){
+        Calendar now = Calendar.getInstance();
+        int yearNow = now.get(Calendar.YEAR);
+        int yearBirth = Integer.parseInt(birthdate.substring(6));
+        int age = yearNow - yearBirth;
+        if (now.get(Calendar.MONTH) < Integer.parseInt(birthdate.substring(0,2)) || (now.get(Calendar.MONTH) == Integer.parseInt(birthdate.substring(0,2)) && now.get(Calendar.DAY_OF_MONTH) < Integer.parseInt(birthdate.substring(3,5)))) {
+            age--;
         }
-        return false;
-
+        return age;
     }
 } 

@@ -18,7 +18,7 @@ public class Firestation {
     public boolean equals(Object obj){
         if(obj instanceof Firestation){
             Firestation firestation= (Firestation) obj;
-            if(this.address.equals(firestation.address)&this.station.equals(firestation.station)){
+            if(this.address.equals(firestation.address)){
                 return true;
             }else return false;
         }else return false;

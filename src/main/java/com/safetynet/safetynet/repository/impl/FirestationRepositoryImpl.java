@@ -16,28 +16,37 @@ import com.safetynet.safetynet.repository.FirestationRepository;
 public class FirestationRepositoryImpl implements FirestationRepository{
     private ObjectMapper objectMapper;
     Data data;
-    @SuppressWarnings("unused")
+    private String path="src/main/resources/data.json";
     private FileWriter fileWriter;
     public FirestationRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
         data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
-        fileWriter=new FileWriter("src/main/resources/data.json");
     }
     @Override
-    public void postFirestation(Firestation firestation) throws JsonProcessingException {
+    public void postFirestation(Firestation firestation) throws IOException {
         data.firestations.add(firestation);
-        objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
+        fileWriter.write(str);
+        fileWriter.close();
+    }
+    @Override
+    public void putFirestation(Firestation firestation) throws IOException {
+        data.firestations.removeIf(i->i.equals(firestation));
+        data.firestations.add(firestation);
+        String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
+        fileWriter.write(str);
+        fileWriter.close();
     }
 
     @Override
-    public void putFirestation(Firestation firestation) {
-        data.firestations.removeIf(i->i.equals(firestation));
-        data.firestations.add(firestation);
-    }
-
-    @Override
-    public void deleteFirestation(Firestation firestation) {
-        data.firestations.removeIf(i->i.equals(firestation));
+    public void deleteFirestation(String adress) throws IOException {
+        data.firestations.removeIf(i->i.address.equals(adress));
+        String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
+        fileWriter.write(str);
+        fileWriter.close();
     }
     @Override
     public String getFirestationByAdress(String adress) throws JsonProcessingException, IOException {

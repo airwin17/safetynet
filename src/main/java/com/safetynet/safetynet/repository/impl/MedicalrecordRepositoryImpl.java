@@ -16,17 +16,18 @@ import com.safetynet.safetynet.repository.MedicalrecordRepository;
 public class MedicalrecordRepositoryImpl implements MedicalrecordRepository{
     private ObjectMapper objectMapper;
     Data data;
+    private String path="src/main/resources/data.json";
     private FileWriter fileWriter;
     public MedicalrecordRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
         data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
-        fileWriter=new FileWriter("src/main/resources/data.json");
     }
     @Override
     public void postMedicalrecord(Medicalrecord medicalrecord) throws JsonProcessingException,IOException {
         data.medicalrecords.add(medicalrecord);
         objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
         fileWriter.write(str);
         fileWriter.close();
     }
@@ -36,6 +37,7 @@ public class MedicalrecordRepositoryImpl implements MedicalrecordRepository{
         data.medicalrecords.removeIf(i->i.equals(medicalrecord));
         data.medicalrecords.add(medicalrecord);
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
         fileWriter.write(str);
         fileWriter.close();
     }
@@ -44,6 +46,7 @@ public class MedicalrecordRepositoryImpl implements MedicalrecordRepository{
     public void deleteMedicalrecord(Medicalrecord medicalrecord) throws JsonProcessingException,IOException {
         data.medicalrecords.removeIf(i->i.equals(medicalrecord));
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+        fileWriter=new FileWriter(path);
         fileWriter.write(str);
         fileWriter.close();
     }
