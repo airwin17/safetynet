@@ -32,7 +32,21 @@ public class GlobalService {
     public GlobalService() {
         
     }
-    public String getFirestationByFirestationNumber(String stationNumber) throws StreamReadException, DatabindException, IOException {
+        /**
+     * Retrieves a JSON node containing information about people living at a given fire station number,
+     * including the number of children living at the station.
+     *
+     * @param  stationNumber   the number of the fire station to retrieve information for
+     * @return                 a JSON node containing the following information:
+     *                         - "people": an array of JSON objects representing each person living at the station,
+     *                                    with each object containing the person's first name, last name, address,
+     *                                    and age
+     *                         - "child count": the number of children living at the station
+     * @throws StreamReadException    if there is an error reading the data stream
+     * @throws DatabindException      if there is an error binding the data to JSON
+     * @throws IOException            if there is an I/O error
+     */
+    public JsonNode getFirestationByFirestationNumber(String stationNumber) throws StreamReadException, DatabindException, IOException {
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -47,9 +61,15 @@ public class GlobalService {
         ObjectNode res=JsonNodeFactory.instance.objectNode();
         res.set("people",personsNode);
         res.put("child count", adultcount);
-        return res.toString();
+        return (JsonNode)res;
     }
-    public String getChildAlert(String address) throws IOException {
+        /**
+     * Retrieves a list of children living at a given address.
+     *
+     * @param  address   the address to search for children
+     * @return           a JSON node containing information about children living at the address
+     */
+    public JsonNode getChildAlert(String address) throws IOException {
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -69,10 +89,18 @@ public class GlobalService {
             ArrayNode personsNode = objectMapper.convertValue(persons2, ArrayNode.class);
             person.set("familly members",personsNode);
         }
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(concernedPersons);
+        return (JsonNode)concernedPersonsNode;
         
     }
-    public String gethPhoneAlert(String fireStationNumber) throws JsonProcessingException, IOException{
+        /**
+     * Retrieves a JSON node containing a list of phone numbers of people living at a given fire station number.
+     *
+     * @param  fireStationNumber   the number of the fire station to retrieve phone numbers for
+     * @return                     a JSON node containing an array of phone numbers
+     * @throws JsonProcessingException if there is an error processing the JSON
+     * @throws IOException            if there is an I/O error
+     */
+    public JsonNode gethPhoneAlert(String fireStationNumber) throws JsonProcessingException, IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationRepository.getFirestationByStation(fireStationNumber));
@@ -80,10 +108,20 @@ public class GlobalService {
         for(String address:adresses){
             concernedPhone.addAll(personRepository.getPersonsByAdress(address).stream().map(person->person.phone).toList());
         }
-        String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(concernedPhone);
+        JsonNode str=objectMapper.convertValue(concernedPhone,JsonNode.class);
         return str;
     }
-    public String getFire(String adress) throws IOException{
+        /**
+     * Retrieves a JSON node containing information about people living at a given address and the fire station at that address.
+     *
+     * @param  adress   the address to search for people and the fire station
+     * @return           a JSON node containing the following information:
+     *                   - "people": an array of JSON objects representing each person living at the address,
+     *                               with each object containing the person's first name, last name, address, and medical record
+     *                   - "firestation": a string representing the fire station at the address
+     * @throws IOException if there is an I/O error
+     */
+    public JsonNode getFire(String adress) throws IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -97,9 +135,15 @@ public class GlobalService {
         ObjectNode res=JsonNodeFactory.instance.objectNode();
         res.set("people",concerned);
         res.put("firestation", firestation);
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(res);
+        return res;
     }
-    public String getFloodStations(String[] stationNumber) throws IOException{
+        /**
+     * Retrieves a JSON node containing information about people living at certain addresses based on station numbers.
+     *
+     * @param  stationNumber   an array of strings representing station numbers
+     * @return                a JSON node containing the gathered information
+     */
+    public JsonNode getFloodStations(String[] stationNumber) throws IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -125,9 +169,16 @@ public class GlobalService {
                 ((ArrayNode) objectNode.get(person.address)).add(thisPerson);
             }
         }
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode);
+        return objectNode;
     }
-    public String getPersonInfolastName(String lastName) throws IOException{
+        /**
+     * Retrieves a JSON node containing information about people with a specific last name.
+     *
+     * @param  lastName   the last name to search for
+     * @return             a JSON node containing information about persons with the specified last name
+     * @throws IOException if there is an I/O error
+     */
+    public JsonNode getPersonInfolastName(String lastName) throws IOException{
         personRepository=new PersonRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
         List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonsByLastName(lastName);
@@ -138,13 +189,19 @@ public class GlobalService {
 
             arrayNode.add(objectNode);
         }
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
+        return arrayNode;
     }
-    public String getCommunityEmail(String city) throws IOException{
+        /**
+     * Retrieves a JSON node containing email addresses of people living in the specified city.
+     *
+     * @param  city   the city to retrieve email addresses for
+     * @return        a JSON node containing email addresses
+     */
+    public JsonNode getCommunityEmail(String city) throws IOException{
         personRepository=new PersonRepositoryImpl();
         List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonByCity(city);
         List<String> emails=persons.stream().map(person->person.email).toList();
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(emails);
+        return objectMapper.convertValue(emails,JsonNode.class);
     }
     public ObjectNode mergeMedicalrecordToPerson(Person person,Medicalrecord medicalrecord){
         ObjectNode personNode=objectMapper.convertValue(person, ObjectNode.class);
