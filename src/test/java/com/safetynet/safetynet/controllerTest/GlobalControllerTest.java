@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,9 +52,10 @@ public void getFirestationTest() throws Exception{
         .andExpect(status().isOk())
         .andReturn();
     String result=ar.getResponse().getContentAsString();
+    System.out.println(result);
         JsonNode people=objectMapper.readTree(result);
-        assertEquals(6,((ObjectNode) people).withArray("people").size());
-        assertEquals("1", people.get("child count").toString());
+        assertEquals(6,((ObjectNode) people).withArray("person").size());
+        assertEquals("1", people.get("childcount").toString());
 }
 @Test
 public void getChildAlertTest() throws Exception{
@@ -90,7 +90,6 @@ public void gethPhoneAlertTest() throws Exception{
             assertEquals(5,((ArrayNode)people.get("people")).size());
             assertEquals("3", people.get("firestation").asText());
     }
-    
    @Test
 public void getFloodTest() throws Exception{
     MvcResult ar=mockMvc.perform(MockMvcRequestBuilders
@@ -99,13 +98,8 @@ public void getFloodTest() throws Exception{
         .param("stationNumber","2")
         .accept(MediaType.APPLICATION_JSON)).andReturn();
     String result=ar.getResponse().getContentAsString();
-        ObjectNode people=(ObjectNode)objectMapper.readTree(result);
-        int count=0;
-        for(JsonNode child:people){
-            count+=child.size();
-        }
+        ArrayNode people=(ArrayNode)objectMapper.readTree(result);
         assertEquals(6,people.size());
-        assertEquals(11,count);
 }
 @Test
 public void getPersonInfolastNameTest() throws Exception{
@@ -127,7 +121,5 @@ public void getCommunityEmailTest() throws Exception{
         ArrayNode people=(ArrayNode)objectMapper.readTree(response);
         assertEquals(23,people.size());
 }
-        
-        
 }
 

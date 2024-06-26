@@ -19,6 +19,11 @@ import com.safetynet.safetynet.repository.MedicalrecordRepository;
 import com.safetynet.safetynet.repository.impl.FirestationRepositoryImpl;
 import com.safetynet.safetynet.repository.impl.MedicalrecordRepositoryImpl;
 import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
+import com.safetynet.safetynet.dto.AdressDTO;
+import com.safetynet.safetynet.dto.ChildAlertDTO;
+import com.safetynet.safetynet.dto.FireDTO;
+import com.safetynet.safetynet.dto.PersonDTO;
+import com.safetynet.safetynet.dto.PersonFirestrationDTO;
 import com.safetynet.safetynet.model.Medicalrecord;
 import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.repository.PersonRepository;
@@ -46,7 +51,7 @@ public class GlobalService {
      * @throws DatabindException      if there is an error binding the data to JSON
      * @throws IOException            if there is an I/O error
      */
-    public JsonNode getFirestationByFirestationNumber(String stationNumber) throws StreamReadException, DatabindException, IOException {
+    public PersonFirestrationDTO getFirestationByFirestationNumber(String stationNumber) throws StreamReadException, DatabindException, IOException {
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -54,14 +59,10 @@ public class GlobalService {
         List<Person> persons=new LinkedList<>();
         for(String address:adresses)
             persons.addAll(personRepository.getPersonsByAdress(address));
-        ArrayNode personsNode = objectMapper.convertValue(persons, ArrayNode.class);
         int adultcount=(int) persons.stream()
         .filter(person->medicalrecordRepository.getMedicalrecordByNames(person.firstName, person.lastName)
         .orElseThrow().getAge()<18).count();
-        ObjectNode res=JsonNodeFactory.instance.objectNode();
-        res.set("people",personsNode);
-        res.put("child count", adultcount);
-        return (JsonNode)res;
+        return new PersonFirestrationDTO(persons,adultcount);
     }
         /**
      * Retrieves a list of children living at a given address.
@@ -69,7 +70,7 @@ public class GlobalService {
      * @param  address   the address to search for children
      * @return           a JSON node containing information about children living at the address
      */
-    public JsonNode getChildAlert(String address) throws IOException {
+    public List<ChildAlertDTO> getChildAlert(String address) throws IOException {
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -77,19 +78,17 @@ public class GlobalService {
         concernedPersons=concernedPersons.stream()
         .filter(person->medicalrecordRepository.getMedicalrecordByNames(person.firstName,person.lastName)
         .orElseThrow().getAge()<18).toList();
-        ArrayNode concernedPersonsNode = objectMapper.convertValue(concernedPersons, ArrayNode.class);
-        for(int i=0;i<concernedPersonsNode.size();i++){
-            ObjectNode person=(ObjectNode)concernedPersonsNode.get(i);
-            String firstname=person.get("firstName").asText();
-            String lastname=person.get("lastName").asText();
+        List<ChildAlertDTO> children=new LinkedList<>();
+        for(int i=0;i<concernedPersons.size();i++){
+            Person person=concernedPersons.get(i);
+            String firstname=person.firstName;
+            String lastname=person.lastName;
             int age=(int) medicalrecordRepository.getMedicalrecordByNames(firstname, lastname).orElseThrow().getAge();
-            person.put("age",age);
             List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonsByLastName(lastname);
             List<Person> persons2=persons.stream().filter(per->!per.firstName.equals(firstname)).toList();
-            ArrayNode personsNode = objectMapper.convertValue(persons2, ArrayNode.class);
-            person.set("familly members",personsNode);
+            children.add(new ChildAlertDTO(persons2,person,age));
         }
-        return (JsonNode)concernedPersonsNode;
+        return children;
         
     }
         /**
@@ -100,7 +99,7 @@ public class GlobalService {
      * @throws JsonProcessingException if there is an error processing the JSON
      * @throws IOException            if there is an I/O error
      */
-    public JsonNode gethPhoneAlert(String fireStationNumber) throws JsonProcessingException, IOException{
+    public List<String> gethPhoneAlert(String fireStationNumber) throws JsonProcessingException, IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationRepository.getFirestationByStation(fireStationNumber));
@@ -108,8 +107,7 @@ public class GlobalService {
         for(String address:adresses){
             concernedPhone.addAll(personRepository.getPersonsByAdress(address).stream().map(person->person.phone).toList());
         }
-        JsonNode str=objectMapper.convertValue(concernedPhone,JsonNode.class);
-        return str;
+        return concernedPhone;
     }
         /**
      * Retrieves a JSON node containing information about people living at a given address and the fire station at that address.
@@ -121,21 +119,18 @@ public class GlobalService {
      *                   - "firestation": a string representing the fire station at the address
      * @throws IOException if there is an I/O error
      */
-    public JsonNode getFire(String adress) throws IOException{
+    public FireDTO getFire(String adress) throws IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
         List<Person> concernedPersons=personRepository.getPersonsByAdress(adress);
         String firestation=firestationRepository.getFirestationByAdress(adress);
-        ArrayNode concerned=JsonNodeFactory.instance.arrayNode();
+        List<PersonDTO> concerned=new LinkedList<>();
         for(Person person:concernedPersons){
             Medicalrecord medicalrecord=medicalrecordRepository.getMedicalrecordByNames(person.firstName,person.lastName).orElseThrow();
-            concerned.add(mergeMedicalrecordToPerson(person, medicalrecord));
+            concerned.add(new PersonDTO(person, medicalrecord,medicalrecord.getAge()));
         }
-        ObjectNode res=JsonNodeFactory.instance.objectNode();
-        res.set("people",concerned);
-        res.put("firestation", firestation);
-        return res;
+        return new FireDTO(firestation,concerned);
     }
         /**
      * Retrieves a JSON node containing information about people living at certain addresses based on station numbers.
@@ -143,7 +138,7 @@ public class GlobalService {
      * @param  stationNumber   an array of strings representing station numbers
      * @return                a JSON node containing the gathered information
      */
-    public JsonNode getFloodStations(String[] stationNumber) throws IOException{
+    public List<AdressDTO> getFloodStations(String[] stationNumber) throws IOException{
         personRepository=new PersonRepositoryImpl();
         firestationRepository=new FirestationRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
@@ -151,25 +146,19 @@ public class GlobalService {
         for(String station:stationNumber){
             adresses.addAll(firestationRepository.getFirestationByStation(station));
         }
-        List<Person> concernedPersons=new LinkedList<>();
+        
+        List<AdressDTO> concernedAdresses=new LinkedList<>();
         for(String address:adresses){
-            concernedPersons.addAll(personRepository.getPersonsByAdress(address));
-        }
-      
-        JsonNode objectNode=JsonNodeFactory.instance.objectNode();
-            
-        for(Person person:concernedPersons){
-            Medicalrecord medicalrecord=medicalrecordRepository.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
-            JsonNode thisPerson=mergeMedicalrecordToPerson(person,medicalrecord);
-            if(objectNode.get(person.address)==null){
-                ArrayNode arrayNode=JsonNodeFactory.instance.arrayNode();
-                arrayNode.add(thisPerson);
-                ((ObjectNode)objectNode).set(person.address, arrayNode);
-            }else{
-                ((ArrayNode) objectNode.get(person.address)).add(thisPerson);
+            List<PersonDTO> concernedPersons=new LinkedList<>();
+            List<Person> persons=personRepository.getPersonsByAdress(address);
+            for(Person person:persons){
+                Medicalrecord medicalrecord=medicalrecordRepository.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
+                concernedPersons.add(new PersonDTO(person, medicalrecord,medicalrecord.getAge()));
             }
+            concernedAdresses.add(new AdressDTO(concernedPersons));
         }
-        return objectNode;
+        
+        return concernedAdresses;
     }
         /**
      * Retrieves a JSON node containing information about people with a specific last name.
@@ -178,18 +167,16 @@ public class GlobalService {
      * @return             a JSON node containing information about persons with the specified last name
      * @throws IOException if there is an I/O error
      */
-    public JsonNode getPersonInfolastName(String lastName) throws IOException{
+    public List<PersonDTO> getPersonInfolastName(String lastName) throws IOException{
         personRepository=new PersonRepositoryImpl();
         medicalrecordRepository=new MedicalrecordRepositoryImpl();
         List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonsByLastName(lastName);
-        ArrayNode arrayNode=JsonNodeFactory.instance.arrayNode();
+        List<PersonDTO> concernedPersons=new LinkedList<>();
         for(Person person:persons){
             Medicalrecord medicalrecord=medicalrecordRepository.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
-            ObjectNode objectNode=mergeMedicalrecordToPerson(person,medicalrecord);
-
-            arrayNode.add(objectNode);
+            concernedPersons.add(new PersonDTO(person, medicalrecord, medicalrecord.getAge()));
         }
-        return arrayNode;
+        return concernedPersons;
     }
         /**
      * Retrieves a JSON node containing email addresses of people living in the specified city.
@@ -197,20 +184,10 @@ public class GlobalService {
      * @param  city   the city to retrieve email addresses for
      * @return        a JSON node containing email addresses
      */
-    public JsonNode getCommunityEmail(String city) throws IOException{
+    public List<String> getCommunityEmail(String city) throws IOException{
         personRepository=new PersonRepositoryImpl();
         List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonByCity(city);
         List<String> emails=persons.stream().map(person->person.email).toList();
-        return objectMapper.convertValue(emails,JsonNode.class);
-    }
-    public ObjectNode mergeMedicalrecordToPerson(Person person,Medicalrecord medicalrecord){
-        ObjectNode personNode=objectMapper.convertValue(person, ObjectNode.class);
-        ObjectNode medicalrecordNode=objectMapper.convertValue(medicalrecord, ObjectNode.class);
-        medicalrecordNode.remove("firstName");
-        medicalrecordNode.remove("lastName");
-        medicalrecordNode.remove("birthdate");
-        personNode.put("age", medicalrecord.getAge());
-        personNode.set("medicalrecord",medicalrecordNode);
-        return personNode;
+        return emails;
     }
 }
