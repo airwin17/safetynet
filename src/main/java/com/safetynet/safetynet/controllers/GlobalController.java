@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.safetynet.safetynet.dto.AdressDTO;
 import com.safetynet.safetynet.dto.ChildAlertDTO;
 import com.safetynet.safetynet.dto.FireDTO;

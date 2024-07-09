@@ -16,9 +16,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.controllers.FirestationController;
 import com.safetynet.safetynet.model.Firestation;
+import com.safetynet.safetynet.util.Data;
 
 public class FirestationControllerTest {
     private static ObjectMapper objectMapper=new ObjectMapper();

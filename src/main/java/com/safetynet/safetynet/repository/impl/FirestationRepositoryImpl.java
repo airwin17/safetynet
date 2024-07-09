@@ -9,9 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.model.Firestation;
 import com.safetynet.safetynet.repository.FirestationRepository;
+import com.safetynet.safetynet.util.Data;
 
 public class FirestationRepositoryImpl implements FirestationRepository{
     private ObjectMapper objectMapper;
@@ -20,7 +20,7 @@ public class FirestationRepositoryImpl implements FirestationRepository{
     private FileWriter fileWriter;
     public FirestationRepositoryImpl() throws StreamReadException, DatabindException, IOException{
         objectMapper=new ObjectMapper();
-        data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
+        data=objectMapper.readValue(new File(path),Data.class);
     }
     @Override
     public void postFirestation(Firestation firestation) throws IOException {

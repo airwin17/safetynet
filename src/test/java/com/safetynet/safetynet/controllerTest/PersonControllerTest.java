@@ -16,9 +16,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.controllers.PersonController;
 import com.safetynet.safetynet.model.Person;
+import com.safetynet.safetynet.util.Data;
 
 public class PersonControllerTest {
     

@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.repository.PersonRepository;
+import com.safetynet.safetynet.util.Data;
 
 public class PersonRepositoryImpl implements PersonRepository{
     private ObjectMapper objectMapper;

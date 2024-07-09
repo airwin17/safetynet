@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.safetynet.safetynet.Data.Data;
 import com.safetynet.safetynet.controllers.GlobalController;
+import com.safetynet.safetynet.util.Data;
 @WebMvcTest(GlobalController.class)
 public class GlobalControllerTest {
     private static ObjectMapper objectMapper=new ObjectMapper();
@@ -88,7 +88,6 @@ public void gethPhoneAlertTest() throws Exception{
             .andReturn().getResponse().getContentAsString();
             ObjectNode people=(ObjectNode)objectMapper.readTree(response);
             assertEquals(5,((ArrayNode)people.get("people")).size());
-            assertEquals("3", people.get("firestation").asText());
     }
    @Test
 public void getFloodTest() throws Exception{

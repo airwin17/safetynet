@@ -1,4 +1,4 @@
-package com.safetynet.safetynet.Data;
+package com.safetynet.safetynet.util;
 
 import java.util.List;
 
