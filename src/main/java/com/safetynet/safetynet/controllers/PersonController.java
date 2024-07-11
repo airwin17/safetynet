@@ -2,6 +2,7 @@ package com.safetynet.safetynet.controllers;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,8 @@ import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.services.PersonService;
 @RestController
 public class PersonController {
-    PersonService personService=new PersonService();
-    public PersonController(){
-        
-    }
+    @Autowired
+    PersonService personService;
     @PostMapping("/person") 
     public ResponseEntity<String> addPerson(@RequestBody Person person) throws IOException{
         try {

@@ -2,12 +2,14 @@ package com.safetynet.safetynet.services;
 
 import java.io.IOException;
 
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.repository.PersonRepository;
 import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
-
+@Service
 public class PersonService {
     PersonRepository personRepositoryImpl;
     public void addPerson(Person person) throws StreamReadException, DatabindException, IOException {

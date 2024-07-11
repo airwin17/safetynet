@@ -2,6 +2,7 @@ package com.safetynet.safetynet.controllers;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,8 @@ import com.safetynet.safetynet.services.MedicalrecordService;
 
 @RestController
 public class MedicalrecordController {
-    MedicalrecordService medicalrecordService=new MedicalrecordService();
+    @Autowired
+    MedicalrecordService medicalrecordService;
     @PostMapping("/medicalrecord")
     public ResponseEntity<String> postMedicalrocord(@RequestBody Medicalrecord medicalrecord) throws IOException{
         try{

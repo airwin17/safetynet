@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynet.model.Person;
-
+@Component
 public interface PersonRepository {
     
     public void postPerson(Person person) throws JsonProcessingException, IOException;

@@ -2,11 +2,13 @@ package com.safetynet.safetynet.services;
 
 import java.io.IOException;
 
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.safetynet.safetynet.model.Firestation;
 import com.safetynet.safetynet.repository.FirestationRepository;
 import com.safetynet.safetynet.repository.impl.FirestationRepositoryImpl;
-
+@Service
 public class FirestationService {
     FirestationRepository firestationRepositoryImpl;
     public void addFirestation(Firestation firestation) throws JsonProcessingException, IOException {

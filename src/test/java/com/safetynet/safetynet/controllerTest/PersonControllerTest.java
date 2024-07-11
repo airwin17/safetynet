@@ -8,25 +8,29 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.controllers.PersonController;
 import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.util.Data;
-
+@SpringBootTest
+@AutoConfigureMockMvc
+@ExtendWith(SpringExtension.class)
 public class PersonControllerTest {
     
-    private static ObjectMapper objectMapper=new ObjectMapper();
-    private static MockMvc mockMvc;
+    private ObjectMapper objectMapper=new ObjectMapper();
+    @Autowired
+    private MockMvc mockMvc;
 @BeforeEach
 public void resetdatabase() throws IOException{
-    mockMvc=MockMvcBuilders.standaloneSetup(new PersonController()).build();
     Data data=objectMapper.readValue(new File("data2.json"), Data.class);
     String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
     FileWriter fileWriter=new FileWriter("src/main/resources/data.json");

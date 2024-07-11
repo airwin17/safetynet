@@ -6,12 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.safetynet.safetynet.repository.FirestationRepository;
-import com.safetynet.safetynet.repository.MedicalrecordRepository;
 import com.safetynet.safetynet.repository.impl.FirestationRepositoryImpl;
 import com.safetynet.safetynet.repository.impl.MedicalrecordRepositoryImpl;
 import com.safetynet.safetynet.repository.impl.PersonRepositoryImpl;
@@ -22,14 +22,14 @@ import com.safetynet.safetynet.dto.PersonDTO;
 import com.safetynet.safetynet.dto.PersonFirestrationDTO;
 import com.safetynet.safetynet.model.Medicalrecord;
 import com.safetynet.safetynet.model.Person;
-import com.safetynet.safetynet.repository.PersonRepository;
-
+@Service
 public class GlobalService {
-    private PersonRepository personRepository;
-    private FirestationRepository firestationRepository;
-    private MedicalrecordRepository medicalrecordRepository;
-    ObjectMapper objectMapper=new ObjectMapper();
-    String datafile="/src/main/resources/data.json";
+    @Autowired
+    private PersonRepositoryImpl personRepository;
+    @Autowired
+    private FirestationRepositoryImpl firestationRepository;
+    @Autowired
+    private MedicalrecordRepositoryImpl medicalrecordRepository;
     public GlobalService() {
         
     }
@@ -48,9 +48,6 @@ public class GlobalService {
      * @throws IOException            if there is an I/O error
      */
     public PersonFirestrationDTO getFirestationByFirestationNumber(String stationNumber) throws StreamReadException, DatabindException, IOException {
-        personRepository=new PersonRepositoryImpl();
-        firestationRepository=new FirestationRepositoryImpl();
-        medicalrecordRepository=new MedicalrecordRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationRepository.getFirestationByStation(stationNumber));
         List<Person> persons=new LinkedList<>();
         for(String address:adresses)
@@ -67,9 +64,6 @@ public class GlobalService {
      * @return           a JSON node containing information about children living at the address
      */
     public List<ChildAlertDTO> getChildAlert(String address) throws IOException {
-        personRepository=new PersonRepositoryImpl();
-        firestationRepository=new FirestationRepositoryImpl();
-        medicalrecordRepository=new MedicalrecordRepositoryImpl();
         List<Person> concernedPersons=personRepository.getPersonsByAdress(address);
         concernedPersons=concernedPersons.stream()
         .filter(person->medicalrecordRepository.getMedicalrecordByNames(person.firstName,person.lastName)
@@ -96,8 +90,6 @@ public class GlobalService {
      * @throws IOException            if there is an I/O error
      */
     public List<String> gethPhoneAlert(String fireStationNumber) throws JsonProcessingException, IOException{
-        personRepository=new PersonRepositoryImpl();
-        firestationRepository=new FirestationRepositoryImpl();
         Set<String> adresses=new HashSet<>(firestationRepository.getFirestationByStation(fireStationNumber));
         List<String> concernedPhone=new LinkedList<>();
         for(String address:adresses){
@@ -116,9 +108,6 @@ public class GlobalService {
      * @throws IOException if there is an I/O error
      */
     public FireDTO getFire(String adress) throws IOException{
-        personRepository=new PersonRepositoryImpl();
-        firestationRepository=new FirestationRepositoryImpl();
-        medicalrecordRepository=new MedicalrecordRepositoryImpl();
         List<Person> concernedPersons=personRepository.getPersonsByAdress(adress);
         String firestation=firestationRepository.getFirestationByAdress(adress);
         List<PersonDTO> concerned=new LinkedList<>();
@@ -135,9 +124,6 @@ public class GlobalService {
      * @return                a JSON node containing the gathered information
      */
     public List<AdressDTO> getFloodStations(String[] stationNumber) throws IOException{
-        personRepository=new PersonRepositoryImpl();
-        firestationRepository=new FirestationRepositoryImpl();
-        medicalrecordRepository=new MedicalrecordRepositoryImpl();
         Set<String> adresses=new HashSet<>();
         for(String station:stationNumber){
             adresses.addAll(firestationRepository.getFirestationByStation(station));
@@ -164,9 +150,7 @@ public class GlobalService {
      * @throws IOException if there is an I/O error
      */
     public List<PersonDTO> getPersonInfolastName(String lastName) throws IOException{
-        personRepository=new PersonRepositoryImpl();
-        medicalrecordRepository=new MedicalrecordRepositoryImpl();
-        List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonsByLastName(lastName);
+        List<Person> persons=personRepository.getPersonsByLastName(lastName);
         List<PersonDTO> concernedPersons=new LinkedList<>();
         for(Person person:persons){
             Medicalrecord medicalrecord=medicalrecordRepository.getMedicalrecordByNames(person.firstName, person.lastName).orElseThrow();
@@ -181,8 +165,8 @@ public class GlobalService {
      * @return        a JSON node containing email addresses
      */
     public List<String> getCommunityEmail(String city) throws IOException{
-        personRepository=new PersonRepositoryImpl();
-        List<Person> persons=((PersonRepositoryImpl)personRepository).getPersonByCity(city);
+        System.out.println(city);
+        List<Person> persons=personRepository.getPersonByCity(city);
         List<String> emails=persons.stream().map(person->person.email).toList();
         return emails;
     }

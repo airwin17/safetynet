@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -12,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.safetynet.model.Medicalrecord;
 import com.safetynet.safetynet.repository.MedicalrecordRepository;
 import com.safetynet.safetynet.util.Data;
-
+@Repository
 public class MedicalrecordRepositoryImpl implements MedicalrecordRepository{
     private ObjectMapper objectMapper;
     Data data;

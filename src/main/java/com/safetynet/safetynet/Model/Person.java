@@ -18,10 +18,6 @@ public class Person {
 
     }
     @Override
-    public String toString(){
-        return firstName+lastName;
-    }
-    @Override
     public boolean equals(Object person){
         if(person instanceof Person){
             Person person0=(Person) person;

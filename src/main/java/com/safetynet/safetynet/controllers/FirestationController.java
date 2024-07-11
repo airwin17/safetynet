@@ -2,6 +2,7 @@ package com.safetynet.safetynet.controllers;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,8 @@ import com.safetynet.safetynet.model.Firestation;
 import com.safetynet.safetynet.services.FirestationService;
 @RestController
 public class FirestationController {
-    FirestationService firestationService=new FirestationService();
+    @Autowired
+    FirestationService firestationService;
     
     @PostMapping("/firestation")
     public ResponseEntity<String> postFirestation(@RequestBody Firestation firestation) throws IOException{

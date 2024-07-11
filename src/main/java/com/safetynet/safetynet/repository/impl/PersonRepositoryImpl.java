@@ -3,8 +3,11 @@ package com.safetynet.safetynet.repository.impl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -13,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.safetynet.model.Person;
 import com.safetynet.safetynet.repository.PersonRepository;
 import com.safetynet.safetynet.util.Data;
-
+@Repository
 public class PersonRepositoryImpl implements PersonRepository{
     private ObjectMapper objectMapper;
     Data data;
@@ -66,7 +69,16 @@ public class PersonRepositoryImpl implements PersonRepository{
         return data.persons.stream().filter(i->i.lastName.equals(lastName)).toList();
     }
     public List<Person> getPersonByCity(String city) {
-        return data.persons.stream().filter(i->i.city.equals(city)).toList();
+        System.out.println(city);
+        List<Person> persons=data.persons;
+        List<Person> res=new LinkedList<>();
+        for(int i=0;i<persons.size();i++){
+            if(persons.get(i).city.equals(city)){
+                res.add(persons.get(i));
+            }
+        }
+
+        return res;
     }
 
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,8 @@ import com.safetynet.safetynet.dto.PersonFirestrationDTO;
 import com.safetynet.safetynet.services.GlobalService;
 @RestController
 public class GlobalController {
-    private GlobalService globalService=new GlobalService();
+    @Autowired
+    private GlobalService globalService;
     Logger logger = LoggerFactory.getLogger(GlobalController.class);
     @GetMapping(value = "/firestation", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
