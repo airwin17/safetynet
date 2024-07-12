@@ -23,12 +23,15 @@ public class PersonRepositoryImpl implements PersonRepository{
     private String path="src/main/resources/data.json";
     private FileWriter fileWriter;
     public PersonRepositoryImpl() throws StreamReadException, DatabindException, IOException{
-        objectMapper=new ObjectMapper();
-        data=objectMapper.readValue(new File("src/main/resources/data.json"),Data.class);
-        
     }
+    public void loadData() throws StreamReadException, DatabindException, IOException{
+        objectMapper=new ObjectMapper();
+        this.data=objectMapper.readValue(new File(path),Data.class);
+    }
+
     @Override
     public void postPerson(Person person) throws IOException {
+        loadData();
         fileWriter=new FileWriter(path);
         data.persons.add(person);
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
@@ -38,6 +41,7 @@ public class PersonRepositoryImpl implements PersonRepository{
 
     @Override
     public void putPerson(Person person) throws IOException {
+        loadData();
         fileWriter=new FileWriter(path);
         data.persons.removeIf(i->i.equals(person));
         data.persons.add(person);
@@ -45,9 +49,10 @@ public class PersonRepositoryImpl implements PersonRepository{
         fileWriter.write(str);
         fileWriter.close();
     }
-
+    
     @Override
     public void deletePerson(Person person) throws IOException {
+        loadData();
         fileWriter=new FileWriter(path);
         data.persons.removeIf(i->i.equals(person));
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
@@ -56,13 +61,16 @@ public class PersonRepositoryImpl implements PersonRepository{
     }
     @Override
     public Optional<Person> getPersonByNames(String firstName, String lastName) throws JsonProcessingException, IOException {
+        loadData();
         return data.persons.stream().filter(i->i.firstName.equals(firstName)&&i.lastName.equals(lastName)).findFirst();
     }
     @Override
     public List<Person> getPersonsByAdress(String address) throws JsonProcessingException, IOException {
+        loadData();
         return data.persons.stream().filter(i->i.address.equals(address)).toList();
     }
     public List<Person> getAllPersons() throws JsonProcessingException, IOException{
+        loadData();
         return data.persons;
     }
     public List<Person> getPersonsByLastName(String lastName) {

@@ -21,11 +21,15 @@ public class FirestationRepositoryImpl implements FirestationRepository{
     private String path="src/main/resources/data.json";
     private FileWriter fileWriter;
     public FirestationRepositoryImpl() throws StreamReadException, DatabindException, IOException{
-        objectMapper=new ObjectMapper();
-        data=objectMapper.readValue(new File(path),Data.class);
     }
+    public void loadData() throws StreamReadException, DatabindException, IOException{
+        objectMapper=new ObjectMapper();
+        this.data=objectMapper.readValue(new File(path),Data.class);
+    }
+
     @Override
     public void postFirestation(Firestation firestation) throws IOException {
+        loadData();
         data.firestations.add(firestation);
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
         fileWriter=new FileWriter(path);
@@ -34,6 +38,7 @@ public class FirestationRepositoryImpl implements FirestationRepository{
     }
     @Override
     public void putFirestation(Firestation firestation) throws IOException {
+        loadData();
         data.firestations.removeIf(i->i.equals(firestation));
         data.firestations.add(firestation);
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
@@ -44,6 +49,7 @@ public class FirestationRepositoryImpl implements FirestationRepository{
 
     @Override
     public void deleteFirestation(String adress) throws IOException {
+        loadData();
         data.firestations.removeIf(i->i.address.equals(adress));
         String str=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
         fileWriter=new FileWriter(path);
@@ -52,10 +58,12 @@ public class FirestationRepositoryImpl implements FirestationRepository{
     }
     @Override
     public String getFirestationByAdress(String adress) throws JsonProcessingException, IOException {
+        loadData();
         return data.firestations.stream().filter(i->i.address.equals(adress)).findFirst().get().station;
     }
     @Override
     public List<String> getFirestationByStation(String station) throws JsonProcessingException, IOException {
+        loadData();
         return data.firestations.stream().filter(i->i.station.equals(station)).map(i-> i.address).toList();
     }
 
